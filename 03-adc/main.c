@@ -25,11 +25,25 @@ void get_temp_callback(const char* args)
     printf("%f\n", temp_C);
 }
 
+void tm_start_callback(const char* args)
+{
+    adc_task_set_state(ADC_TASK_STATE_RUN);
+    printf("Measurements started\n");
+}
+
+void tm_stop_callback(const char* args)
+{
+    adc_task_set_state(ADC_TASK_STATE_IDLE);
+    printf("Measurements stopped\n");
+}
+
 api_t device_api[] =
 {
     {"version", version_callback, "get device name and firmware version"},
     {"get_adc", get_adc_callback, "measure voltage on GPIO26"},
-    {"get_temp", get_temp_callback, "measure internal temperature"},  // ← ЭТА СТРОКА ОТСУТСТВУЕТ!
+    {"get_temp", get_temp_callback, "measure internal temperature"},
+    {"tm_start", tm_start_callback, "start periodic measurements (voltage and temperature)"},
+    {"tm_stop", tm_stop_callback, "stop periodic measurements"},
     {NULL, NULL, NULL},
 };
 
@@ -50,5 +64,7 @@ int main()
         {
             protocol_task_handle(command);
         }
+        
+        adc_task_handle();
     }
 }
